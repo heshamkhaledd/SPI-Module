@@ -3,23 +3,24 @@
 module Shift_Register #(parameter REG_WIDTH = 8)
 (
         input clk,
+        input regClk,
         input [REG_WIDTH-1:0] inReg,
         input inBit,
-        input EN, //Always low on operation
+        input EN,
         output reg outBit
 );
 
 reg [REG_WIDTH-1:0] inData;
 
 
+always@(posedge regClk && EN)
+begin
+    inData <= inReg;
+end
+
 always@(posedge clk)
 begin
-    if (!EN)
-        begin
-            outBit <= inData[0];
-            inData <= {inBit,inData[REG_WIDTH-1:1]};
-        end
-    else
-        inData <= inReg;
+           outBit <= inData[0];
+           inData <= {inBit,inData[REG_WIDTH-1:1]};
 end
 endmodule

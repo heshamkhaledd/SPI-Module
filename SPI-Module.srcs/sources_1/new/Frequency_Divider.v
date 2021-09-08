@@ -26,7 +26,7 @@ begin
         end
     else if (counter == (clockPrescaler/2)-1)
         begin
-        SCLK = ~ SCLK;
+        SCLK <= ~ SCLK;
         counter <= 0;
         end
     else

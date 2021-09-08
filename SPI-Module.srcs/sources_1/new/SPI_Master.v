@@ -4,50 +4,54 @@ module SPI_Master #(parameter [3:0] clockPrescaler = 4'b0001, parameter REG_WIDT
 (
     input clk,
     input [REG_WIDTH-1:0] dataToSend,
-    input inBit,
     input MISO,
-    output SS,
+    input spiInit,
+    output reg SS,
     output SCLK,
     output MOSI     
 );
 
-Shift_Register #(REG_WIDTH) (.clk(SCLK),
-                             .inReg(dataToSend),
-                             .inBit(inBit),
-                             .EN(SS),
-                             .outBit(MOSI));
+Shift_Register #(REG_WIDTH)     shiftRegister (.clk(SCLK),
+                                               .regClk(clk),
+                                               .inReg(dataToSend),
+                                               .inBit(MISO),
+                                               .EN(SS),
+                                               .outBit(MOSI));
                              
 Frequency_Divider #(clockPrescaler) Prescaler (.clk(clk),
                                                .EN(SS),
                                                .SCLK(SCLK));
 
 
-parameter idleState     = 2'b00;
-parameter dataState     = 2'b01; 
-parameter finishState   = 2'b10;
+localparam idleState     = 2'b00;
+localparam dataState     = 2'b01; 
+localparam finishState   = 2'b10;
 
 reg [1:0] currState;
-reg stateSS;
 integer Itr;
 
-assign SS = stateSS;
+
 initial begin
 currState = idleState;
 Itr = 0;
+SS = 1;
 end
 
-always@(posedge SCLK)
+always@(posedge clk)
     begin
         case (currState)
             idleState: begin
-                        if (SS != 1)
-                            currState <= dataState;
+                        if (spiInit == 1)
+                            begin
+                                currState <= dataState;
+                            end
                         else
                             currState <= idleState;
                        end
                        
             dataState: begin
-                        if (Itr != REG_WIDTH)
+                        SS <= 0;
+                        if (Itr != REG_WIDTH*clockPrescaler)
                            Itr = Itr + 1;
                         else
                             begin
@@ -57,7 +61,7 @@ always@(posedge SCLK)
                        end
             
             finishState: begin
-                          stateSS = 1;
+                          SS <= 1;
                          end
         endcase
 
