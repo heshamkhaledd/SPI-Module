@@ -3,6 +3,7 @@
 
 module SPI_Slave #(parameter REG_WIDTH = 8)
 (
+    input srcClk,
     input clk,
     input [REG_WIDTH-1:0] dataToSend,
     input MOSI,
@@ -11,7 +12,7 @@ module SPI_Slave #(parameter REG_WIDTH = 8)
 );
 
 Shift_Register #(REG_WIDTH)     shiftRegister (.clk(clk),
-                                               .regClk(clk),
+                                               .regClk(srcClk),
                                                .inReg(dataToSend),
                                                .inBit(MOSI),
                                                .EN(SS),
