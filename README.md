@@ -1,6 +1,6 @@
 # SPI-Module
 Implemented a configurable Daisy Chain Full-Duplex SPI Communication Protocol that supports the following customizations: <br/><br/>
-• Varying slave SCLK periods with a frequency dividing module<br/>
+• Varying slave SCLK periods with a frequency dividing prescaler module<br/>
 • Configurable Data frame width for different slave architectures
 
 # System Architecture
